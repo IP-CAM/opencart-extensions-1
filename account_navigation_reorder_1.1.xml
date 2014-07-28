@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	This vqmod script reorders the links that sprear in account navigation panel, and change "Order History" to a button.
+
+	List of file(s) modified:
+		/catalog/view/theme/default/template/module/account.tpl
+--> 
+<modification>
+    <id>account_nav_reordering</id>
+    <version>1.0</version>
+    <vqmver>2.X</vqmver>
+    <author>Flint</author>
+    <file name="/catalog/view/theme/default/template/module/account.tpl">
+        <operation info="reorder account navigaion panel">
+            <search position="replace" offset="50"><![CDATA[
+                        <div class="box">
+                        ]]></search>
+            <add><![CDATA[
+				<div class="box">
+				  <div class="box-heading"><?php echo $heading_title; ?></div>
+				  <div class="box-content">
+					<ul style="list-style-type:none">
+					  <li><a class="button" href="<?php echo $order; ?>"><?php echo $text_order; ?></a></li>
+					  <BR>
+					  <li><a href="<?php echo $account; ?>"><?php echo $text_account; ?></a></li>
+					  <li><a href="<?php echo $wishlist; ?>"><?php echo $text_wishlist; ?></a></li>
+					  <li><a href="<?php echo $address; ?>"><?php echo $text_address; ?></a></li>
+					  <li><a href="<?php echo $transaction; ?>"><?php echo $text_transaction; ?></a></li>
+					  <li><a href="<?php echo $download; ?>"><?php echo $text_download; ?></a></li>
+					  <li><a href="<?php echo $return; ?>"><?php echo $text_return; ?></a></li>
+					  <li><a href="<?php echo $newsletter; ?>"><?php echo $text_newsletter; ?></a></li>
+					  <li><a href="<?php echo $recurring; ?>"><?php echo $text_recurring; ?></a></li>
+					  
+					  <?php if ($logged) { ?>
+					  <BR>
+					  <li><a href="<?php echo $logout; ?>"><?php echo $text_logout; ?></a></li>
+					  <?php } ?>
+					</ul>
+				  </div>
+				</div>
+            ]]></add>
+        </operation>
+    </file>
+</modification>
