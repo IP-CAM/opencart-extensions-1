@@ -9,7 +9,7 @@
     <id>account_nav_reordering</id>
     <version>1.0</version>
     <vqmver>2.X</vqmver>
-    <author>Flint</author>
+    <author>kaihuang201</author>
     <file name="/catalog/view/theme/default/template/module/account.tpl">
         <operation info="reorder account navigaion panel">
             <search position="replace" offset="50"><![CDATA[
