@@ -1,0 +1,1112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	This vqmod script combines order "View" and "Edit" pages, and puts the combined page under the old "Edit" page.
+
+    List of file(s) modified:
+		/admin/view/template/sale/order_form.tpl
+		/admin/controller/sale/order.php
+		/admin/view/template/sale/order_list.tpl
+--> 
+<modification>
+	<id>combined_order_view_edit</id>
+	<version>1.0</version>
+	<vqmver>2.X</vqmver>
+	<author>Flint</author>
+	<file name="/admin/view/template/sale/order_form.tpl">
+
+
+
+		<operation info="add_vtab_for_orderDetails_and_History">
+			<search position="replace">
+				<![CDATA[
+					<div id="vtabs" class="vtabs"><a href="#tab-customer"><?php echo $tab_customer; ?></a><a href="#tab-payment"><?php echo $tab_payment; ?></a><a href="#tab-shipping"><?php echo $tab_shipping; ?></a><a href="#tab-product"><?php echo $tab_product; ?></a><a href="#tab-voucher"><?php echo $tab_voucher; ?></a><a href="#tab-total"><?php echo $tab_total; ?></a></div>
+				]]>
+			</search>
+
+			<add>
+				<![CDATA[
+					<div id="vtabs" class="vtabs">
+						<a href="#tab-order"><?php echo $tab_order; ?></a>
+						<a href="#tab-customer"><?php echo $tab_customer; ?></a>
+						<a href="#tab-payment"><?php echo $tab_payment; ?></a>
+						<a href="#tab-shipping"><?php echo $tab_shipping; ?></a>
+						<a href="#tab-product"><?php echo $tab_product; ?></a>
+						<a href="#tab-voucher"><?php echo $tab_voucher; ?></a>
+						<a href="#tab-total"><?php echo $tab_total; ?></a>
+						<a href="#tab-history"><?php echo $tab_history; ?></a>
+						<?php if ($maxmind_id) { ?>
+							<a href="#tab-fraud"><?php echo $tab_fraud; ?></a>
+						<?php } ?>
+					</div>
+				]]>
+			</add>
+		</operation>
+
+
+		<operation info="add_vtab_contents_for_orderDetails_and_History">
+			<search position="before">
+				<![CDATA[
+					<div id="tab-customer" class="vtabs-content">
+				]]>
+			</search>
+
+			<add>
+				<![CDATA[
+					<div id="tab-order" class="vtabs-content">
+						<table class="form">
+						  <tr>
+							<td><?php echo $text_order_id; ?></td>
+							<td>#<?php echo $order_id; ?></td>
+						  </tr>
+						  <?php if (!empty($amazon_order_id)) { ?>
+						  
+						  <tr>
+							<td><?php echo $text_amazon_order_id; ?></td>
+							<td><?php echo $amazon_order_id; ?></td>
+						  </tr>
+						  
+						  <?php } ?>
+						  <tr>
+							<td><?php echo $text_invoice_no; ?></td>
+							<td><?php if ($invoice_no) { ?>
+							  <?php echo $invoice_no; ?>
+							  <?php } else { ?>
+							  <span id="invoice"><b>[</b> <a id="invoice-generate"><?php echo $text_generate; ?></a> <b>]</b></span>
+							  <?php } ?></td>
+						  </tr>
+						  <tr>
+							<td><?php echo $text_store_name; ?></td>
+							<td><?php echo $store_name; ?></td>
+						  </tr>
+						  <tr>
+							<td><?php echo $text_store_url; ?></td>
+							<td><a href="<?php echo $store_url; ?>" target="_blank"><u><?php echo $store_url; ?></u></a></td>
+						  </tr>
+						  <?php if ($customer) { ?>
+						  <tr>
+							<td><?php echo $text_customer; ?></td>
+							<td><a href="<?php echo $customer; ?>"><?php echo $firstname; ?> <?php echo $lastname; ?></a></td>
+						  </tr>
+						  <?php } else { ?>
+						  <tr>
+							<td><?php echo $text_customer; ?></td>
+							<td><?php echo $firstname; ?> <?php echo $lastname; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($customer_group) { ?>
+						  <tr>
+							<td><?php echo $text_customer_group; ?></td>
+							<td><?php echo $customer_group; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <tr>
+							<td><?php echo $text_email; ?></td>
+							<td><?php echo $email; ?></td>
+						  </tr>
+						  <tr>
+							<td><?php echo $text_telephone; ?></td>
+							<td><?php echo $telephone; ?></td>
+						  </tr>
+						  <?php if ($fax) { ?>
+						  <tr>
+							<td><?php echo $text_fax; ?></td>
+							<td><?php echo $fax; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <tr>
+							<td><?php echo $text_total; ?></td>
+							<td><?php echo $total; ?>
+							  <?php if ($credit && $customer) { ?>
+							  <?php if (!$credit_total) { ?>
+							  <span id="credit"><b>[</b> <a id="credit-add"><?php echo $text_credit_add; ?></a> <b>]</b></span>
+							  <?php } else { ?>
+							  <span id="credit"><b>[</b> <a id="credit-remove"><?php echo $text_credit_remove; ?></a> <b>]</b></span>
+							  <?php } ?>
+							  <?php } ?></td>
+						  </tr>
+						  <?php if ($reward && $customer) { ?>
+						  <tr>
+							<td><?php echo $text_reward; ?></td>
+							<td><?php echo $reward; ?>
+							  <?php if (!$reward_total) { ?>
+							  <span id="reward"><b>[</b> <a id="reward-add"><?php echo $text_reward_add; ?></a> <b>]</b></span>
+							  <?php } else { ?>
+							  <span id="reward"><b>[</b> <a id="reward-remove"><?php echo $text_reward_remove; ?></a> <b>]</b></span>
+							  <?php } ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($order_status) { ?>
+						  <tr>
+							<td><?php echo $text_order_status; ?></td>
+							<td id="order-status"><?php echo $order_status; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($comment) { ?>
+						  <tr>
+							<td><?php echo $text_comment; ?></td>
+							<td><?php echo $comment; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($affiliate) { ?>
+						  <tr>
+							<td><?php echo $text_affiliate; ?></td>
+							<td><a href="<?php echo $affiliate; ?>"><?php echo $affiliate_firstname; ?> <?php echo $affiliate_lastname; ?></a></td>
+						  </tr>
+						  <tr>
+							<td><?php echo $text_commission; ?></td>
+							<td><?php echo $commission; ?>
+							  <?php if (!$commission_total) { ?>
+							  <span id="commission"><b>[</b> <a id="commission-add"><?php echo $text_commission_add; ?></a> <b>]</b></span>
+							  <?php } else { ?>
+							  <span id="commission"><b>[</b> <a id="commission-remove"><?php echo $text_commission_remove; ?></a> <b>]</b></span>
+							  <?php } ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip) { ?>
+						  <tr>
+							<td><?php echo $text_ip; ?></td>
+							<td><?php echo $ip; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($forwarded_ip) { ?>
+						  <tr>
+							<td><?php echo $text_forwarded_ip; ?></td>
+							<td><?php echo $forwarded_ip; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($user_agent) { ?>
+						  <tr>
+							<td><?php echo $text_user_agent; ?></td>
+							<td><?php echo $user_agent; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($accept_language) { ?>
+						  <tr>
+							<td><?php echo $text_accept_language; ?></td>
+							<td><?php echo $accept_language; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <tr>
+							<td><?php echo $text_date_added; ?></td>
+							<td><?php echo $date_added; ?></td>
+						  </tr>
+						  <tr>
+							<td><?php echo $text_date_modified; ?></td>
+							<td><?php echo $date_modified; ?></td>
+						  </tr>
+						</table>
+					  </div>
+					   
+					  <div id="tab-history" class="vtabs-content">
+						<div id="history"></div>
+						<table class="form">
+						  <tr>
+							<td><?php echo $entry_order_status; ?></td>
+							<td>
+							  <input type="hidden" name="hist_old_order_status_id" value="<?php echo $order_status_id; ?>" id="hist_old_order_status_id"
+							  />
+							  <select name="hist_order_status_id">
+								<?php foreach ($order_statuses as $order_status) { ?>
+                    <?php if ($order_status['order_status_id'] == $order_status_id) { ?>
+                    <option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+                    <?php } else { ?>
+                    <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+                    <?php } ?>
+                    <?php } ?>
+							  </select>
+							</td>
+						  </tr>
+						  <tr>
+							<td><?php echo $entry_notify; ?></td>
+							<td><input type="checkbox" name="hist_notify" value="1" /></td>
+						  </tr>
+						  <tr>
+							<td><?php echo $entry_comment; ?></td>
+							<td><textarea name="hist_comment" cols="40" rows="8" style="width: 99%"></textarea>
+							  <div style="margin-top: 10px; text-align: right;"><a id="button-history" class="button"><?php echo $button_add_history; ?></a></div></td>
+						  </tr>
+						</table>
+					  </div>
+					  <?php if ($maxmind_id) { ?>
+					  <div id="tab-fraud" class="vtabs-content">
+						<table class="form">
+						  <?php if ($country_match) { ?>
+						  <tr>
+							<td><?php echo $text_country_match; ?></td>
+							<td><?php echo $country_match; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($country_code) { ?>
+						  <tr>
+							<td><?php echo $text_country_code; ?></td>
+							<td><?php echo $country_code; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($high_risk_country) { ?>
+						  <tr>
+							<td><?php echo $text_high_risk_country; ?></td>
+							<td><?php echo $high_risk_country; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($distance) { ?>
+						  <tr>
+							<td><?php echo $text_distance; ?></td>
+							<td><?php echo $distance; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_region) { ?>
+						  <tr>
+							<td><?php echo $text_ip_region; ?></td>
+							<td><?php echo $ip_region; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_city) { ?>
+						  <tr>
+							<td><?php echo $text_ip_city; ?></td>
+							<td><?php echo $ip_city; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_latitude) { ?>
+						  <tr>
+							<td><?php echo $text_ip_latitude; ?></td>
+							<td><?php echo $ip_latitude; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_longitude) { ?>
+						  <tr>
+							<td><?php echo $text_ip_longitude; ?></td>
+							<td><?php echo $ip_longitude; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_isp) { ?>
+						  <tr>
+							<td><?php echo $text_ip_isp; ?></td>
+							<td><?php echo $ip_isp; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_org) { ?>
+						  <tr>
+							<td><?php echo $text_ip_org; ?></td>
+							<td><?php echo $ip_org; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_asnum) { ?>
+						  <tr>
+							<td><?php echo $text_ip_asnum; ?></td>
+							<td><?php echo $ip_asnum; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_user_type) { ?>
+						  <tr>
+							<td><?php echo $text_ip_user_type; ?></td>
+							<td><?php echo $ip_user_type; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_country_confidence) { ?>
+						  <tr>
+							<td><?php echo $text_ip_country_confidence; ?></td>
+							<td><?php echo $ip_country_confidence; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_region_confidence) { ?>
+						  <tr>
+							<td><?php echo $text_ip_region_confidence; ?></td>
+							<td><?php echo $ip_region_confidence; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_city_confidence) { ?>
+						  <tr>
+							<td><?php echo $text_ip_city_confidence; ?></td>
+							<td><?php echo $ip_city_confidence; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_postal_confidence) { ?>
+						  <tr>
+							<td><?php echo $text_ip_postal_confidence; ?></td>
+							<td><?php echo $ip_postal_confidence; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_postal_code) { ?>
+						  <tr>
+							<td><?php echo $text_ip_postal_code; ?></td>
+							<td><?php echo $ip_postal_code; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_accuracy_radius) { ?>
+						  <tr>
+							<td><?php echo $text_ip_accuracy_radius; ?></td>
+							<td><?php echo $ip_accuracy_radius; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_net_speed_cell) { ?>
+						  <tr>
+							<td><?php echo $text_ip_net_speed_cell; ?></td>
+							<td><?php echo $ip_net_speed_cell; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_metro_code) { ?>
+						  <tr>
+							<td><?php echo $text_ip_metro_code; ?></td>
+							<td><?php echo $ip_metro_code; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_area_code) { ?>
+						  <tr>
+							<td><?php echo $text_ip_area_code; ?></td>
+							<td><?php echo $ip_area_code; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_time_zone) { ?>
+						  <tr>
+							<td><?php echo $text_ip_time_zone; ?></td>
+							<td><?php echo $ip_time_zone; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_region_name) { ?>
+						  <tr>
+							<td><?php echo $text_ip_region_name; ?></td>
+							<td><?php echo $ip_region_name; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_domain) { ?>
+						  <tr>
+							<td><?php echo $text_ip_domain; ?></td>
+							<td><?php echo $ip_domain; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_country_name) { ?>
+						  <tr>
+							<td><?php echo $text_ip_country_name; ?></td>
+							<td><?php echo $ip_country_name; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_continent_code) { ?>
+						  <tr>
+							<td><?php echo $text_ip_continent_code; ?></td>
+							<td><?php echo $ip_continent_code; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ip_corporate_proxy) { ?>
+						  <tr>
+							<td><?php echo $text_ip_corporate_proxy; ?></td>
+							<td><?php echo $ip_corporate_proxy; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($anonymous_proxy) { ?>
+						  <tr>
+							<td><?php echo $text_anonymous_proxy; ?></td>
+							<td><?php echo $anonymous_proxy; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($proxy_score) { ?>
+						  <tr>
+							<td><?php echo $text_proxy_score; ?></td>
+							<td><?php echo $proxy_score; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($is_trans_proxy) { ?>
+						  <tr>
+							<td><?php echo $text_is_trans_proxy; ?></td>
+							<td><?php echo $is_trans_proxy; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($free_mail) { ?>
+						  <tr>
+							<td><?php echo $text_free_mail; ?></td>
+							<td><?php echo $free_mail; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($carder_email) { ?>
+						  <tr>
+							<td><?php echo $text_carder_email; ?></td>
+							<td><?php echo $carder_email; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($high_risk_username) { ?>
+						  <tr>
+							<td><?php echo $text_high_risk_username; ?></td>
+							<td><?php echo $high_risk_username; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($high_risk_password) { ?>
+						  <tr>
+							<td><?php echo $text_high_risk_password; ?></td>
+							<td><?php echo $high_risk_password; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($bin_match) { ?>
+						  <tr>
+							<td><?php echo $text_bin_match; ?></td>
+							<td><?php echo $bin_match; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($bin_country) { ?>
+						  <tr>
+							<td><?php echo $text_bin_country; ?></td>
+							<td><?php echo $bin_country; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($bin_name_match) { ?>
+						  <tr>
+							<td><?php echo $text_bin_name_match; ?></td>
+							<td><?php echo $bin_name_match; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($bin_name) { ?>
+						  <tr>
+							<td><?php echo $text_bin_name; ?></td>
+							<td><?php echo $bin_name; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($bin_phone_match) { ?>
+						  <tr>
+							<td><?php echo $text_bin_phone_match; ?></td>
+							<td><?php echo $bin_phone_match; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($bin_phone) { ?>
+						  <tr>
+							<td><?php echo $text_bin_phone; ?></td>
+							<td><?php echo $bin_phone; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($customer_phone_in_billing_location) { ?>
+						  <tr>
+							<td><?php echo $text_customer_phone_in_billing_location; ?></td>
+							<td><?php echo $customer_phone_in_billing_location; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ship_forward) { ?>
+						  <tr>
+							<td><?php echo $text_ship_forward; ?></td>
+							<td><?php echo $ship_forward; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($city_postal_match) { ?>
+						  <tr>
+							<td><?php echo $text_city_postal_match; ?></td>
+							<td><?php echo $city_postal_match; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($ship_city_postal_match) { ?>
+						  <tr>
+							<td><?php echo $text_ship_city_postal_match; ?></td>
+							<td><?php echo $ship_city_postal_match; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($score) { ?>
+						  <tr>
+							<td><?php echo $text_score; ?></td>
+							<td><?php echo $score; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($explanation) { ?>
+						  <tr>
+							<td><?php echo $text_explanation; ?></td>
+							<td><?php echo $explanation; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($risk_score) { ?>
+						  <tr>
+							<td><?php echo $text_risk_score; ?></td>
+							<td><?php echo $risk_score; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($queries_remaining) { ?>
+						  <tr>
+							<td><?php echo $text_queries_remaining; ?></td>
+							<td><?php echo $queries_remaining; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($maxmind_id) { ?>
+						  <tr>
+							<td><?php echo $text_maxmind_id; ?></td>
+							<td><?php echo $maxmind_id; ?></td>
+						  </tr>
+						  <?php } ?>
+						  <?php if ($error) { ?>
+						  <tr>
+							<td><?php echo $text_error; ?></td>
+							<td><?php echo $error; ?></td>
+						  </tr>
+						  <?php } ?>
+						</table>
+					  </div>
+					  <?php } ?>
+				]]>
+			</add>
+		</operation>
+		
+		
+		<operation info="js_for_orderDetails_and_History">
+			<search position="replace">
+				<![CDATA[
+					$('.vtabs a').tabs();
+				]]>
+			</search>
+
+			<add>
+				<![CDATA[
+					$('#invoice-generate').live('click', function() {
+						$.ajax({
+							url: 'index.php?route=sale/order/createinvoiceno&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+							dataType: 'json',
+							beforeSend: function() {
+								$('#invoice').after('<img src="view/image/loading.gif" class="loading" style="padding-left: 5px;" />');	
+							},
+							complete: function() {
+								$('.loading').remove();
+							},
+							success: function(json) {
+								$('.success, .warning').remove();
+						
+								if (json['error']) {
+									$('#tab-order').prepend('<div class="warning" style="display: none;">' + json['error'] + '</div>');
+				
+									$('.warning').fadeIn('slow');
+								}
+			
+								if (json.invoice_no) {
+									$('#invoice').fadeOut('slow', function() {
+										$('#invoice').html(json['invoice_no']);
+					
+										$('#invoice').fadeIn('slow');
+									});
+								}
+							}
+						});
+					});
+
+
+
+
+					$('#credit-add').live('click', function() {
+						$.ajax({
+							url: 'index.php?route=sale/order/addcredit&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+							type: 'post',
+							dataType: 'json',
+							beforeSend: function() {
+								$('#credit').after('<img src="view/image/loading.gif" class="loading" style="padding-left: 5px;" />');			
+							},
+							complete: function() {
+								$('.loading').remove();
+							},			
+							success: function(json) {
+								$('.success, .warning').remove();
+			
+								if (json['error']) {
+									$('.box').before('<div class="warning" style="display: none;">' + json['error'] + '</div>');
+				
+									$('.warning').fadeIn('slow');
+								}
+			
+								if (json['success']) {
+									$('.box').before('<div class="success" style="display: none;">' + json['success'] + '</div>');
+				
+									$('.success').fadeIn('slow');
+				
+									$('#credit').html('<b>[</b> <a id="credit-remove"><?php echo $text_credit_remove; ?></a> <b>]</b>');
+								}
+							}
+						});
+					});
+
+					$('#credit-remove').live('click', function() {
+						$.ajax({
+							url: 'index.php?route=sale/order/removecredit&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+							type: 'post',
+							dataType: 'json',
+							beforeSend: function() {
+								$('#credit').after('<img src="view/image/loading.gif" class="loading" style="padding-left: 5px;" />');			
+							},
+							complete: function() {
+								$('.loading').remove();
+							},			
+							success: function(json) {
+								$('.success, .warning').remove();
+						
+								if (json['error']) {
+									$('.box').before('<div class="warning" style="display: none;">' + json['error'] + '</div>');
+				
+									$('.warning').fadeIn('slow');
+								}
+			
+								if (json['success']) {
+									$('.box').before('<div class="success" style="display: none;">' + json['success'] + '</div>');
+				
+									$('.success').fadeIn('slow');
+				
+									$('#credit').html('<b>[</b> <a id="credit-add"><?php echo $text_credit_add; ?></a> <b>]</b>');
+								}
+							}
+						});
+					});
+
+					$('#reward-add').live('click', function() {
+						$.ajax({
+							url: 'index.php?route=sale/order/addreward&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+							type: 'post',
+							dataType: 'json',
+							beforeSend: function() {
+								$('#reward').after('<img src="view/image/loading.gif" class="loading" style="padding-left: 5px;" />');			
+							},
+							complete: function() {
+								$('.loading').remove();
+							},									
+							success: function(json) {
+								$('.success, .warning').remove();
+						
+								if (json['error']) {
+									$('.box').before('<div class="warning" style="display: none;">' + json['error'] + '</div>');
+				
+									$('.warning').fadeIn('slow');
+								}
+			
+								if (json['success']) {
+									$('.box').before('<div class="success" style="display: none;">' + json['success'] + '</div>');
+				
+									$('.success').fadeIn('slow');
+
+									$('#reward').html('<b>[</b> <a id="reward-remove"><?php echo $text_reward_remove; ?></a> <b>]</b>');
+								}
+							}
+						});
+					});
+
+					$('#reward-remove').live('click', function() {
+						$.ajax({
+							url: 'index.php?route=sale/order/removereward&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+							type: 'post',
+							dataType: 'json',
+							beforeSend: function() {
+								$('#reward').after('<img src="view/image/loading.gif" class="loading" style="padding-left: 5px;" />');
+							},
+							complete: function() {
+								$('.loading').remove();
+							},				
+							success: function(json) {
+								$('.success, .warning').remove();
+						
+								if (json['error']) {
+									$('.box').before('<div class="warning" style="display: none;">' + json['error'] + '</div>');
+				
+									$('.warning').fadeIn('slow');
+								}
+			
+								if (json['success']) {
+									$('.box').before('<div class="success" style="display: none;">' + json['success'] + '</div>');
+				
+									$('.success').fadeIn('slow');
+				
+									$('#reward').html('<b>[</b> <a id="reward-add"><?php echo $text_reward_add; ?></a> <b>]</b>');
+								}
+							}
+						});
+					});
+
+
+
+
+					$('#history .pagination a').live('click', function() {
+						$('#history').load(this.href);
+	
+						return false;
+					});			
+
+					$('#history').load('index.php?route=sale/order/history&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+
+					$('#button-history').live('click', function() {
+
+						if(typeof verifyStatusChange == 'function'){
+							if(verifyStatusChange() == false){
+								return false;
+							}else{
+								addOrderInfo();
+							}
+						}else{
+							addOrderInfo();
+						}
+
+						$.ajax({
+							url: 'index.php?route=sale/order/history&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+							type: 'post',
+							dataType: 'html',
+							data: 'order_status_id=' + encodeURIComponent($('select[name=\'hist_order_status_id\']').val()) + '&notify=' + encodeURIComponent($('input[name=\'hist_notify\']').attr('checked') ? 1 : 0) + '&append=' + encodeURIComponent($('input[name=\'append\']').attr('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'hist_comment\']').val()),
+							beforeSend: function() {
+								$('.success, .warning').remove();
+								$('#button-history').attr('disabled', true);
+								$('#history').prepend('<div class="attention"><img src="view/image/loading.gif" alt="" /> <?php echo $text_wait; ?></div>');
+							},
+							complete: function() {
+								$('#button-history').attr('disabled', false);
+								$('.attention').remove();
+							},
+							success: function(html) {
+								$('#history').html(html);
+			
+								$('textarea[name=\'hist_comment\']').val('');
+			
+								$('#order-status').html($('select[name=\'hist_order_status_id\'] option:selected').text());
+							}
+						});
+					});
+					//--></script> 
+					<script type="text/javascript"><!--
+					$('.vtabs a').tabs();
+					//--></script>
+					
+					
+													<script>
+														function changeQuantity($obj) {
+															var quantity = $($obj).val();
+														  	var sib = $($obj).siblings([type="hidden"]);
+														  	sib.val(quantity);
+														}
+													</script>
+					
+					
+					
+					<script type="text/javascript"><!--
+						function orderStatusChange(){
+							var status_id = $('select[name="hist_order_status_id"]').val();
+
+							$('#openbayInfo').remove();
+
+							$.ajax({
+								url: 'index.php?route=extension/openbay/ajaxOrderInfo&token=<?php echo $this->request->get['token']; ?>&order_id=<?php echo $this->request->get['order_id']; ?>&status_id='+status_id,
+								type: 'post',
+								dataType: 'html',
+								beforeSend: function(){},
+								success: function(html) {
+									$('#history').after(html);
+								},
+								failure: function(){},
+								error: function(){}
+							});
+						}
+
+						function addOrderInfo(){
+							var status_id = $('select[name="hist_order_status_id"]').val();
+							var old_status_id = $('#hist_old_order_status_id').val();
+
+							$('#hist_old_order_status_id').val(status_id);
+							$('select[name="order_status_id"]').val(status_id);
+
+							$.ajax({
+								url: 'index.php?route=extension/openbay/ajaxAddOrderInfo&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>&status_id='+status_id+'&old_status_id='+old_status_id,
+								type: 'post',
+								dataType: 'html',
+								data: $(".openbayData").serialize(),
+								beforeSend: function(){},
+								success: function() {},
+								failure: function(){},
+								error: function(){}
+							});
+						}
+
+						$(document).ready(function() {
+							orderStatusChange();
+						});
+
+						$('select[name="hist_order_status_id"]').change(function(){orderStatusChange();});
+				]]>
+			</add>
+		</operation>
+
+
+		<operation info="plus_minus_quantity_in_js">
+			<search position="replace">
+				<![CDATA[
+					html += '  <td class="right">' + product['quantity'] + '<input type="hidden" name="order_product[' + product_row + '][quantity]" value="' + product['quantity'] + '" /></td>';
+				]]>
+			</search>
+
+			<add>
+				<![CDATA[
+					html += '  <td class="right">' +
+					'<input class="changeQuantity" type="number" min="0" onchange="changeQuantity(this)" value="' + 
+					product['quantity'] + 
+					'"> ' +
+					'<input type="hidden" name="order_product[' + product_row + '][quantity]" value="' + product['quantity'] + '" /></td>';
+				]]>
+			</add>
+		</operation>
+
+
+		<operation info="plus_minus_quantity_in_html">
+			<search position="replace" index="1">
+				<![CDATA[
+					<td class="right"><?php echo $order_product['quantity']; ?>
+				]]>
+			</search>
+
+			<add>
+				<![CDATA[
+					<td class="right">
+					<input class="changeQuantity" type="number" min="0" onchange="changeQuantity(this)" value="<?php echo $order_product['quantity']; ?>"> 
+				]]>
+			</add>
+		</operation>
+
+
+		<operation info="plus_minus_quantity_update_button">
+			<search position="before" index="2">
+				<![CDATA[
+					<table class="list">
+				]]>
+			</search>
+
+			<add>
+				<![CDATA[
+						<div  style='float:right; padding:7px'>
+							<a onclick="$('#button-update').trigger('click');" class="button">&nbsp&nbsp Update Quantity &nbsp&nbsp</a>
+						</div>
+					<br>
+				]]>
+			</add>
+		</operation>
+	</file>
+
+
+
+
+	<file name="/admin/controller/sale/order.php">
+		<operation info="load_vars_in_getForm_function_in_order_php">
+			<search position="after">
+				<![CDATA[
+					public function getForm() {
+				]]>
+			</search>
+
+			<add>
+				<![CDATA[
+					//info
+					$this->data['text_amazon_order_id'] = $this->language->get('text_amazon_order_id');
+					$this->data['text_name'] = $this->language->get('text_name');
+					$this->data['text_order_id'] = $this->language->get('text_order_id');
+					$this->data['text_invoice_no'] = $this->language->get('text_invoice_no');
+					$this->data['text_invoice_date'] = $this->language->get('text_invoice_date');
+					$this->data['text_store_name'] = $this->language->get('text_store_name');
+					$this->data['text_store_url'] = $this->language->get('text_store_url');
+					$this->data['text_customer'] = $this->language->get('text_customer');
+					$this->data['text_customer_group'] = $this->language->get('text_customer_group');
+					$this->data['text_email'] = $this->language->get('text_email');
+					$this->data['text_telephone'] = $this->language->get('text_telephone');
+					$this->data['text_fax'] = $this->language->get('text_fax');
+					$this->data['text_total'] = $this->language->get('text_total');
+					$this->data['text_reward'] = $this->language->get('text_reward');
+					$this->data['text_order_status'] = $this->language->get('text_order_status');
+					$this->data['text_comment'] = $this->language->get('text_comment');
+					$this->data['text_affiliate'] = $this->language->get('text_affiliate');
+					$this->data['text_commission'] = $this->language->get('text_commission');
+					$this->data['text_ip'] = $this->language->get('text_ip');
+					$this->data['text_forwarded_ip'] = $this->language->get('text_forwarded_ip');
+					$this->data['text_user_agent'] = $this->language->get('text_user_agent');
+					$this->data['text_accept_language'] = $this->language->get('text_accept_language');
+					$this->data['text_date_added'] = $this->language->get('text_date_added');
+					$this->data['text_date_modified'] = $this->language->get('text_date_modified');
+					$this->data['text_firstname'] = $this->language->get('text_firstname');
+					$this->data['text_lastname'] = $this->language->get('text_lastname');
+					$this->data['text_company'] = $this->language->get('text_company');
+					$this->data['text_company_id'] = $this->language->get('text_company_id');
+					$this->data['text_tax_id'] = $this->language->get('text_tax_id');
+					$this->data['text_address_1'] = $this->language->get('text_address_1');
+					$this->data['text_address_2'] = $this->language->get('text_address_2');
+					$this->data['text_city'] = $this->language->get('text_city');
+					$this->data['text_postcode'] = $this->language->get('text_postcode');
+					$this->data['text_zone'] = $this->language->get('text_zone');
+					$this->data['text_zone_code'] = $this->language->get('text_zone_code');
+					$this->data['text_country'] = $this->language->get('text_country');
+					$this->data['text_shipping_method'] = $this->language->get('text_shipping_method');
+					$this->data['text_payment_method'] = $this->language->get('text_payment_method');
+					$this->data['text_download'] = $this->language->get('text_download');
+					$this->data['text_wait'] = $this->language->get('text_wait');
+					$this->data['text_generate'] = $this->language->get('text_generate');
+					$this->data['text_reward_add'] = $this->language->get('text_reward_add');
+					$this->data['text_reward_remove'] = $this->language->get('text_reward_remove');
+					$this->data['text_commission_add'] = $this->language->get('text_commission_add');
+					$this->data['text_commission_remove'] = $this->language->get('text_commission_remove');
+					$this->data['text_credit_add'] = $this->language->get('text_credit_add');
+					$this->data['text_credit_remove'] = $this->language->get('text_credit_remove');
+					$this->data['text_country_match'] = $this->language->get('text_country_match');
+					$this->data['text_country_code'] = $this->language->get('text_country_code');
+					$this->data['text_high_risk_country'] = $this->language->get('text_high_risk_country');
+					$this->data['text_distance'] = $this->language->get('text_distance');
+					$this->data['text_ip_region'] = $this->language->get('text_ip_region');
+					$this->data['text_ip_city'] = $this->language->get('text_ip_city');
+					$this->data['text_ip_latitude'] = $this->language->get('text_ip_latitude');
+					$this->data['text_ip_longitude'] = $this->language->get('text_ip_longitude');
+					$this->data['text_ip_isp'] = $this->language->get('text_ip_isp');
+					$this->data['text_ip_org'] = $this->language->get('text_ip_org');
+					$this->data['text_ip_asnum'] = $this->language->get('text_ip_asnum');
+					$this->data['text_ip_user_type'] = $this->language->get('text_ip_user_type');
+					$this->data['text_ip_country_confidence'] = $this->language->get('text_ip_country_confidence');
+					$this->data['text_ip_region_confidence'] = $this->language->get('text_ip_region_confidence');
+					$this->data['text_ip_city_confidence'] = $this->language->get('text_ip_city_confidence');
+					$this->data['text_ip_postal_confidence'] = $this->language->get('text_ip_postal_confidence');
+					$this->data['text_ip_postal_code'] = $this->language->get('text_ip_postal_code');
+					$this->data['text_ip_accuracy_radius'] = $this->language->get('text_ip_accuracy_radius');
+					$this->data['text_ip_net_speed_cell'] = $this->language->get('text_ip_net_speed_cell');
+					$this->data['text_ip_metro_code'] = $this->language->get('text_ip_metro_code');
+					$this->data['text_ip_area_code'] = $this->language->get('text_ip_area_code');
+					$this->data['text_ip_time_zone'] = $this->language->get('text_ip_time_zone');
+					$this->data['text_ip_region_name'] = $this->language->get('text_ip_region_name');
+					$this->data['text_ip_domain'] = $this->language->get('text_ip_domain');
+					$this->data['text_ip_country_name'] = $this->language->get('text_ip_country_name');
+					$this->data['text_ip_continent_code'] = $this->language->get('text_ip_continent_code');
+					$this->data['text_ip_corporate_proxy'] = $this->language->get('text_ip_corporate_proxy');
+					$this->data['text_anonymous_proxy'] = $this->language->get('text_anonymous_proxy');
+					$this->data['text_proxy_score'] = $this->language->get('text_proxy_score');
+					$this->data['text_is_trans_proxy'] = $this->language->get('text_is_trans_proxy');
+					$this->data['text_free_mail'] = $this->language->get('text_free_mail');
+					$this->data['text_carder_email'] = $this->language->get('text_carder_email');
+					$this->data['text_high_risk_username'] = $this->language->get('text_high_risk_username');
+					$this->data['text_high_risk_password'] = $this->language->get('text_high_risk_password');
+					$this->data['text_bin_match'] = $this->language->get('text_bin_match');
+					$this->data['text_bin_country'] = $this->language->get('text_bin_country');
+					$this->data['text_bin_name_match'] = $this->language->get('text_bin_name_match');
+					$this->data['text_bin_name'] = $this->language->get('text_bin_name');
+					$this->data['text_bin_phone_match'] = $this->language->get('text_bin_phone_match');
+					$this->data['text_bin_phone'] = $this->language->get('text_bin_phone');
+					$this->data['text_customer_phone_in_billing_location'] = $this->language->get('text_customer_phone_in_billing_location');
+					$this->data['text_ship_forward'] = $this->language->get('text_ship_forward');
+					$this->data['text_city_postal_match'] = $this->language->get('text_city_postal_match');
+					$this->data['text_ship_city_postal_match'] = $this->language->get('text_ship_city_postal_match');
+					$this->data['text_score'] = $this->language->get('text_score');
+					$this->data['text_explanation'] = $this->language->get('text_explanation');
+					$this->data['text_risk_score'] = $this->language->get('text_risk_score');
+					$this->data['text_queries_remaining'] = $this->language->get('text_queries_remaining');
+					$this->data['text_maxmind_id'] = $this->language->get('text_maxmind_id');
+					$this->data['text_error'] = $this->language->get('text_error');
+
+					$this->data['column_product'] = $this->language->get('column_product');
+					$this->data['column_model'] = $this->language->get('column_model');
+					$this->data['column_quantity'] = $this->language->get('column_quantity');
+					$this->data['column_price'] = $this->language->get('column_price');
+					$this->data['column_total'] = $this->language->get('column_total');
+					$this->data['column_download'] = $this->language->get('column_download');
+					$this->data['column_filename'] = $this->language->get('column_filename');
+					$this->data['column_remaining'] = $this->language->get('column_remaining');
+
+					$this->data['entry_order_status'] = $this->language->get('entry_order_status');
+					$this->data['entry_notify'] = $this->language->get('entry_notify');
+					$this->data['entry_comment'] = $this->language->get('entry_comment');
+
+					$this->data['button_invoice'] = $this->language->get('button_invoice');
+					$this->data['button_cancel'] = $this->language->get('button_cancel');
+					$this->data['button_add_history'] = $this->language->get('button_add_history');
+
+					$this->data['tab_order'] = $this->language->get('tab_order');
+					$this->data['tab_payment'] = $this->language->get('tab_payment');
+					$this->data['tab_shipping'] = $this->language->get('tab_shipping');
+					$this->data['tab_product'] = $this->language->get('tab_product');
+					$this->data['tab_history'] = $this->language->get('tab_history');
+					$this->data['tab_fraud'] = $this->language->get('tab_fraud');
+
+
+
+
+					$this->load->model('sale/order');
+
+					if (isset($this->request->get['order_id'])) {
+						$order_id = $this->request->get['order_id'];
+					} else {
+						$order_id = 0;
+					}
+
+					$order_info = $this->model_sale_order->getOrder($order_id);
+						$this->data['token'] = $this->session->data['token'];
+	
+					$this->load->model('sale/customer_group');
+
+						$customer_group_info = $this->model_sale_customer_group->getCustomerGroup($order_info['customer_group_id']);
+
+						if ($customer_group_info) {
+							$this->data['customer_group'] = $customer_group_info['name'];
+						} else {
+							$this->data['customer_group'] = '';
+						}
+						$this->load->model('sale/customer');
+						
+						
+						$this->data['total'] = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value']);
+
+						if ($order_info['total'] < 0) {
+							$this->data['credit'] = $order_info['total'];
+						} else {
+							$this->data['credit'] = 0;
+						}
+						
+						$this->data['credit_total'] = $this->model_sale_customer->getTotalTransactionsByOrderId($this->request->get['order_id']);
+
+						$this->data['reward'] = $order_info['reward'];
+
+						$this->data['reward_total'] = $this->model_sale_customer->getTotalCustomerRewardsByOrderId($this->request->get['order_id']);
+						$this->load->model('localisation/order_status');
+
+						$order_status_info = $this->model_localisation_order_status->getOrderStatus($order_info['order_status_id']);
+
+						if ($order_status_info) {
+							$this->data['order_status'] = $order_status_info['name'];
+						} else {
+							$this->data['order_status'] = '';
+						}
+
+						$this->data['ip'] = $order_info['ip'];
+						$this->data['forwarded_ip'] = $order_info['forwarded_ip'];
+						$this->data['user_agent'] = $order_info['user_agent'];
+						$this->data['accept_language'] = $order_info['accept_language'];
+						$this->data['date_added'] = date($this->language->get('date_format_short'), strtotime($order_info['date_added']));
+						$this->data['date_modified'] = date($this->language->get('date_format_short'), strtotime($order_info['date_modified']));
+						
+						if ($order_info['invoice_no']) {
+							$this->data['invoice_no'] = $order_info['invoice_prefix'] . $order_info['invoice_no'];
+						} else {
+							$this->data['invoice_no'] = '';
+						}
+
+						$this->data['amazon_order_id'] = $order_info['amazon_order_id'];
+						$this->data['store_name'] = $order_info['store_name'];
+						$this->data['store_url'] = $order_info['store_url'];
+						
+                                                    $this->load->model('sale/fraud');
+                                                    $fraud_info = $this->model_sale_fraud->getFraud($order_info['order_id']);
+						if ($fraud_info) {
+							$this->data['maxmind_id'] = $fraud_info['maxmind_id'];
+						} else {
+							$this->data['maxmind_id'] = '';
+						}
+				]]>
+			</add>
+		</operation>
+	</file>
+
+
+
+
+	<file name="/admin/view/template/sale/order_list.tpl">
+		<operation info="combine_view_edit_link">
+			<search position="replace" offset="2">
+				<![CDATA[
+					<td class="right"><?php foreach ($order['action'] as $action) { ?>
+				]]>
+			</search>
+
+			<add>
+				<![CDATA[
+					<td class="right"><?php foreach ($order['action'] as $action) { ?>
+                	<a class="button" href="<?php echo $action['href']; ?>">
+                		<?php if ($action['text'] == "Edit") echo "&nbsp;&nbsp;&nbsp;" ?>
+                		<?php echo $action['text']; ?>
+                		<?php if ($action['text'] == "Edit") echo "&nbsp;&nbsp;&nbsp;" ?>
+                	</a>
+                	<?php } ?></td>
+				]]>
+			</add>
+		</operation>
+	</file>
+
+
+
+
+</modification>
